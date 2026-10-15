@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수능 국어 어휘력 10분 마스터 | 속담·관용표현 모의고사</title>
+  <meta name="description" content="고3 수험생을 위한 국어 수업 전 10분 워밍업 5지선다 모의고사 웹앱. 수능 빈출 속담 및 관용표현 마스터와 오답 클리닉 제공">
+  <!-- CSS 상대 경로 연결 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 상단 글로벌 헤더 -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-badge">고3 국어</span>
+        <h1 class="brand-title">수능 속담·관용표현 10분 워밍업</h1>
+      </div>
+      <button type="button" id="btnOpenTeacherModal" class="teacher-mode-btn" title="교사용 대시보드 열기">
+        <span>🔒</span> 교사용 모드
+      </button>
+    </div>
+  </header>
+
+  <!-- 메인 영역 -->
+  <main class="app-container">
+
+    <!-- ====================================================================
+         화면 1: 시작 화면 (Start Screen)
+         ==================================================================== -->
+    <section id="startScreen" class="screen active">
+      <div class="start-card">
+        <div class="exam-cover-badge">
+          <span class="exam-tag">2026학년도 대학수학능력시험 대비 어휘 특강</span>
+        </div>
+        <h2 class="start-title">국어 영역 속담·관용구 10분 미니 모의평가</h2>
+        <p class="start-subtitle">수업 전 10분으로 수능·모의고사 필수 어휘를 정복하세요!</p>
+
+        <div class="exam-info-box">
+          <div class="exam-info-title">
+            <span>📌</span> 수험생 유의사항 및 응시 안내
+          </div>
+          <ul class="exam-info-list">
+            <li><strong>문항 구성</strong>: 수능·평가원 빈출 속담 및 관용표현 <strong>총 10문항 (5지선다형)</strong></li>
+            <li><strong>제한 시간</strong>: <strong>10분 (600초)</strong> / 남은 시간 1분 시 경고 알림 표시</li>
+            <li><strong>진행 방식</strong>: 10문항을 모두 푼 후 최종 제출하면 즉시 채점 및 상세 해설이 제공됩니다.</li>
+            <li><strong>오답 클리닉</strong>: 제출 후 틀린 문제만 모아서 바로 다시 풀어볼 수 있습니다.</li>
+          </ul>
+        </div>
+
+        <!-- 수험생 정보 입력 -->
+        <div class="student-input-group">
+          <div class="input-field-wrapper">
+            <label for="studentNameInput" class="input-label">이름 <span class="req">*</span></label>
+            <input type="text" id="studentNameInput" class="custom-input" placeholder="예: 김국어" autocomplete="off" maxlength="15">
+          </div>
+          <div class="input-field-wrapper">
+            <label for="studentIdInput" class="input-label">학번 / 번호 (선택)</label>
+            <input type="text" id="studentIdInput" class="custom-input" placeholder="예: 30105 또는 1번" autocomplete="off" maxlength="10">
+          </div>
+          <button type="button" id="btnStartQuiz" class="btn-start">
+            <span>📝</span> 시험 시작하기 (10분 카운트다운)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         화면 2: 시험 문제 풀이 화면 (Quiz Screen)
+         ==================================================================== -->
+    <section id="quizScreen" class="screen">
+      <!-- 상단 타이머 및 진행 바 -->
+      <div class="quiz-header-bar">
+        <div id="timerBox" class="timer-box">
+          <span class="timer-icon">⏱️</span>
+          <span>남은 시간:</span>
+          <span id="timerDisplay">10:00</span>
+        </div>
+        <div class="progress-info">
+          <span id="progressText">0 / 10 풀이 완료</span>
+          <div class="progress-bar-track">
+            <div id="quizProgressBar" class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 문제 카드 영역 -->
+      <div class="question-paper-card">
+        <div class="question-meta-row">
+          <div class="meta-tags-group">
+            <span id="qNumberBadge" class="question-number-badge">문항 1</span>
+            <span id="qTypeTag" class="question-type-tag">속담</span>
+          </div>
+          <span id="qSourceTag" class="question-source-badge">출처 표시</span>
+        </div>
+
+        <!-- 문제 발문 -->
+        <h3 id="qStem" class="question-stem">문제 발문이 표시되는 공간입니다.</h3>
+
+        <!-- <보기> 지문 영역 (내용이 없으면 자동 숨김) -->
+        <div id="qPassageBox" class="question-passage-box"></div>
+
+        <!-- 5지선다 선택지 -->
+        <div id="optionsContainer" class="options-list"></div>
+      </div>
+
+      <!-- 하단 OMR 내비게이션 및 컨트롤 버튼 -->
+      <div class="quiz-footer-controls">
+        <!-- OMR 번호판 -->
+        <div class="omr-nav-section">
+          <div class="omr-nav-title">
+            <span>OMR 빠른 문항 이동 (클릭하여 이동)</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">* 파란색은 답안 선택 완료 문항</span>
+          </div>
+          <div id="omrGrid" class="omr-grid">
+            <!-- 자바스크립트로 1~10번 버튼 동적 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 하단 액션 버튼 -->
+        <div class="quiz-btn-row">
+          <button type="button" id="btnPrevQuestion" class="btn-nav" disabled>
+            <span>‹</span> 이전 문항
+          </button>
+          <button type="button" id="btnNextQuestion" class="btn-nav">
+            다음 문항 <span>›</span>
+          </button>
+          <button type="button" id="btnSubmitExam" class="btn-submit-exam">
+            <span>📤</span> 최종 답안 제출하기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         화면 3: 결과 및 해설 화면 (Result Screen)
+         ==================================================================== -->
+    <section id="resultScreen" class="screen">
+      <!-- 토닥토닥 수고하셨습니다 축하 배너 -->
+      <div class="encouragement-banner">
+        <div class="pat-animation-wrapper">
+          <span class="sparkle-icon">✨</span>
+          <span class="pat-hand" role="img" aria-label="토닥토닥 격려">✋</span>
+          <span class="sparkle-icon">✨</span>
+        </div>
+        <h2 class="encouragement-title">토닥토닥, 오늘도 수고 많으셨습니다!</h2>
+        <p class="encouragement-sub">매일 10분의 꾸준한 노력이 수능 국어 1등급의 탄탄한 밑거름이 됩니다.</p>
+      </div>
+
+      <!-- 성적 요약 카드 -->
+      <div class="score-summary-card">
+        <div class="score-stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">환산 점수</div>
+            <div class="stat-value score-highlight"><span id="scoreValueDisplay">100</span><span style="font-size:1.1rem;">점</span></div>
+            <div id="scoreGradeTag" class="stat-grade-tag grade-1">수능 1등급 수준</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">풀이 소요 시간</div>
+            <div id="statTimeTaken" class="stat-value" style="font-size:1.35rem;">6분 24초</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">맞힌 문항</div>
+            <div id="statCorrectCount" class="stat-value" style="color:var(--accent-green);">10개</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">틀린 문항</div>
+            <div id="statWrongCount" class="stat-value" style="color:var(--accent-red);">0개</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 결과 액션 버튼 -->
+      <div class="result-actions-row">
+        <button type="button" id="btnRetryWrong" class="btn-retry-wrong">
+          <span>✏️</span> 틀린 문항만 바로 다시 풀기
+        </button>
+        <button type="button" id="btnNewExam" class="btn-new-exam">
+          <span>🔄</span> 새로운 10문제 풀기 (시작 화면)
+        </button>
+      </div>
+
+      <!-- 정답 및 상세 해설지 (오답 노트) -->
+      <div class="review-section-header">
+        <h3 class="review-section-title">
+          <span>📑</span> 모의고사 상세 해설지 & 오답 사전
+        </h3>
+      </div>
+      <div id="reviewListContainer" class="review-list">
+        <!-- 자바스크립트로 10문항의 정답/오답/해설 카드 렌더링 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================
+       교사용 모달 (대시보드 및 PIN 잠금)
+       ====================================================================== -->
+  <div id="teacherModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span>🔐</span> 교사용 결과 관리 대시보드
+        </h2>
+        <button type="button" id="btnCloseModal" class="btn-close-modal" title="닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 1) PIN 비밀번호 입력 섹션 -->
+        <div id="pinInputSection" class="pin-login-box">
+          <div class="pin-login-title">교사 인증 비밀번호 입력</div>
+          <p class="pin-login-desc">학생 응시 현황 및 성적을 열람하려면 PIN 번호를 입력하세요.<br>(기본 초기 비밀번호: <strong>1234</strong>)</p>
+          <div class="pin-input-row">
+            <input type="password" id="pinInput" class="pin-input" placeholder="PIN 4자리" maxlength="6" autocomplete="off">
+            <button type="button" id="btnPinSubmit" class="pin-btn">확인</button>
+          </div>
+          <div id="pinErrorMsg" class="pin-error-msg"></div>
+        </div>
+
+        <!-- 2) 대시보드 메인 뷰 -->
+        <div id="dashboardView" class="dashboard-view">
+          <div class="dashboard-stats-row">
+            <div class="dash-stat-card">
+              <div class="dash-stat-num" id="totalExamsCount">0회</div>
+              <div class="dash-stat-title">총 응시 횟수</div>
+            </div>
+            <div class="dash-stat-card">
+              <div class="dash-stat-num" id="avgScoreCount">0점</div>
+              <div class="dash-stat-title">평균 점수</div>
+            </div>
+            <div class="dash-stat-card">
+              <div class="dash-stat-num" id="highScoreCount">0점</div>
+              <div class="dash-stat-title">최고 점수</div>
+            </div>
+          </div>
+
+          <div class="dashboard-toolbar">
+            <div style="font-size:0.9rem; font-weight:700; color:var(--text-main);">학생별 응시 기록표</div>
+            <div class="toolbar-actions">
+              <button type="button" id="btnExportCsv" class="btn-dash-action btn-csv" title="엑셀로 다운로드">
+                <span>📊</span> 엑셀(CSV) 저장
+              </button>
+              <button type="button" id="btnClearRecords" class="btn-dash-action btn-clear" title="기록 초기화">
+                <span>🗑️</span> 기록 초기화
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>응시 일시</th>
+                  <th>이름</th>
+                  <th>학번</th>
+                  <th>점수</th>
+                  <th>소요 시간</th>
+                  <th>결과</th>
+                </tr>
+              </thead>
+              <tbody id="resultsTableBody">
+                <!-- 동적으로 학생 기록 삽입 -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 선생님을 위한 문제 편집 팁 -->
+          <div class="teacher-guide-tip">
+            <strong>💡 선생님을 위한 문제 은행 추가 팁:</strong><br>
+            <code>app.js</code> 파일의 상단 <code>QUESTION_BANK</code> 배열에 동일한 형식으로 문제를 추가하거나 문장을 수정하시면 웹앱에 즉시 반영됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
+  <footer class="site-footer">
+    <p>고3 수험생을 위한 국어 어휘력 10분 마스터 &copy; 교육용 워밍업 웹앱</p>
+  </footer>
+
+  <!-- JavaScript 상대 경로 연결 -->
+  <script src="app.js"></script>
+</body>
+</html>
